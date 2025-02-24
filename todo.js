@@ -41,9 +41,6 @@ function signin(req,res,next){
         })
     }
 }
-function showtodos(req,res,next){
-    token=req.headers.token;  
-}
 
 function showtodos(req,res,next){
     try{
