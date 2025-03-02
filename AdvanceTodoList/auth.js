@@ -21,7 +21,7 @@ function Validate(req, res, next) {
         password: z.string().min(6)
     });
 
-    const parsedData = Schema.safeParse(req.body);
+    const parsedData = Schema.safeParse(req.body);console.log(parsedData)
     if (!parsedData.success) {
         return res.status(400).json({ message: "Invalid format" });
     }
@@ -86,7 +86,7 @@ app.post('/signin', Validate, async function (req, res) {
 
 async function auth(req, res, next) {
     try {
-        console.log("Headers received:", req.headers); 
+        // console.log("Headers received:", req.headers); 
 
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -109,12 +109,13 @@ async function auth(req, res, next) {
             }
         }
 
-        const user = await UserModel.findById(userdetails.id).select("-password");
+        const user =userdetails.id;
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
         req.user = user;
+        // console.log(req.user);
         next();
     } catch (error) {
         res.status(500).json({ message: "Auth error", error: error.message });
@@ -125,21 +126,63 @@ app.get("/me", auth, (req, res) => {
     res.json({ user: req.user });
 });
 
-app.post("/todos",auth,async function (req,res,){
+app.post("/addtodos",auth,async function (req,res,){
      try{
         const { Title, done}=req.body;
 
         if(!Title || !done){
             return res.status(400).json({messsage:"Title/field is empty"})
         }
-        req.userId=req.userId;
-        const newUser=await TodoModel.create({Title,done,userId:req.userId});
+        userId=req.user;
+       console.log(typeof userId);
+        const newUser=await TodoModel.create({Title,done,UserId:userId});
         return res.json({message:"Added Successfully"});
      }
      catch(error){
         return res.status(400).json({message:"unable to add todos",error:error.message})
      }
-     
+})
+
+app.get("/todos",auth,async function(req,res,){
+    try{
+    const userId=new mongoose.Types.ObjectId(req.user);
+    const todos=await TodoModel.find({UserId:userId});
+    res.json({
+        todos:todos
+    })
+}
+catch(error){
+    res.status(400).json({
+              message:"error while accessing todos",error:error.message
+    })
+}
+})
+
+app.put('/updatetodos/:id',auth,async function(req,res){
+    try{
+    const {id}=req.params;
+    const update= await TodoModel.findByIdAndUpdate(id,req.body);
+    if(!update){
+        return res.status(404).json({message:`cannot find any product with ID ${id}`});
+    }
+    const updatetodos=await TodoModel.findById(id);;
+    res.json(updatetodos);
+}
+catch(error){
+    return res.status(500).json({message:error.message});
+}
+})
+app.delete('/deletetodos/:id',auth,async function(req,res){
+    const {id}=req.params;
+    const todo=await TodoModel.findByIdAndDelete(id);
+    if(!todo){
+        return res.status(404).json({message:`id not found ${id}`});
+    }
+    const userID=req.user;
+    const remainingTodos=await TodoModel.find({UserId:userID});
+    res.json({message:"Todo deleted successfully",
+        remainingtodos:remainingTodos
+    });
 })
 app.listen(3000, () => {
     console.log("Server Activated on Port 3000");

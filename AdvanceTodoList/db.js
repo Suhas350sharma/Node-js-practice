@@ -13,7 +13,7 @@ const User=new Schema({
 const todos=new Schema({
     Title:String,
     done:Boolean,
-    UserId:ObjectId
+    UserId:{type:mongoose.Schema.Types.ObjectId, require:true}
 });
 
 const UserModel=mongoose.model("Users",User);
