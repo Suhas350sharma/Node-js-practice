@@ -1,0 +1,41 @@
+Redis Client Example with Node.js
+
+📌 Overview
+
+This project demonstrates how to connect to a Redis server using Node.js. It covers basic Redis operations like setting/getting values, working with hashes, lists, sets, and using the publish/subscribe feature for real-time messaging.
+
+🛠 Installation & Setup
+
+1️⃣ Prerequisites
+
+Node.js (Ensure you have Node.js installed)
+
+Redis (Install and run Redis on your system)
+
+Install Redis on Linux (Ubuntu/Debian)
+
+sudo apt update
+sudo apt install redis
+
+Install Redis on macOS (Using Homebrew)
+
+brew install redis
+
+Install Redis on Windows
+
+Use WSL (Windows Subsystem for Linux) or install via Memurai for Windows.
+
+2️⃣ Start Redis Server
+
+Before running the Node.js script, ensure Redis is running.
+
+redis-server
+
+Verify Redis is running by checking:
+
+redis-cli ping
+# Response: PONG
+
+3️⃣ Install Node.js Dependencies
+
+Navigate to the project folder and install Redis client for Node.js:
